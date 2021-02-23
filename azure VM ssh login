@@ -1,0 +1,3 @@
+ssh -i ~/.ssh/ adminUsername@104.45.7.4 # master
+ssh -i ~/.ssh/ adminUsername@104.40.217.189 # worker01
+ssh -i ~/.ssh/ adminUsername@104.45.13.219 # nfs
