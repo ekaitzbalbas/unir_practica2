@@ -1,15 +1,13 @@
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
-ansible_user=ansible
+ansible_user=adminUsername
+ansible_port=22
 
 [master]
-# adminUsername@master
-master
+51.144.239.209 #master
 
 [worker]
-# adminUsername@worker01
-worker01
+51.144.248.243 #worker01
 
 [nfs]
-# adminUsername@nfs
-nfs
+51.144.113.233 #nfs

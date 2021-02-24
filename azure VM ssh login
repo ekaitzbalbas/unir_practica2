@@ -1,3 +1,15 @@
-ssh -i ~/.ssh/ adminUsername@104.45.7.4 # master
-ssh -i ~/.ssh/ adminUsername@104.40.217.189 # worker01
-ssh -i ~/.ssh/ adminUsername@104.45.13.219 # nfs
+ssh -i ~/.ssh/ adminUsername@51.144.239.209 # master
+ssh -i ~/.ssh/ adminUsername@51.144.248.243 # worker01
+ssh -i ~/.ssh/ adminUsername@51.144.113.233 # nfs
+
+ssh -i ~/.ssh/ adminUsername@master # master
+ssh -i ~/.ssh/ adminUsername@worker01 # worker01
+ssh -i ~/.ssh/ adminUsername@nfs # nfs
+
+ssh adminUsername@51.144.239.209 # master
+ssh adminUsername@51.144.248.243 # worker01
+ssh adminUsername@51.144.113.233 # nfs
+
+ssh adminUsername@master # master
+ssh adminUsername@worker01 # worker01
+ssh adminUsername@nfs # nfs
