@@ -1,0 +1,32 @@
+- name: tareas previas de configuracion
+  hosts: all
+  become: yes
+  tasks:
+    - name: Establecer la zona horaria a Europe/Madrid
+      timezone:
+        name: Europe/Madrid  
+
+    - name: Instalar la ultima version de chrony 
+      dnf:
+        name: chrony 
+        state: latest  
+
+    - name: Habilitar and arrancar el servicio de chronyd on centos
+      systemd:
+        name: chronyd    
+        enabled: yes
+        state: started
+
+    - name: Habilitar ntp
+      command: /usr/bin/timedatectl set-ntp true
+      # shell: timedatectl set-ntp true
+
+    - name: Desactivar SELinux 
+      shell: sed -i s/=enforcing/=disabled/g /etc/selinux/config
+
+    - name: Instalar la ultima version de nfs-utils nfs4-acl-tools wget
+      dnf:
+        name: nfs-utils 
+        name: nfs4-acl-tools 
+        name: wget 
+        state: latest        

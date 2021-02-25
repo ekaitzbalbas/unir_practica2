@@ -1,8 +1,4 @@
-sudo dnf install chrony -y
-sudo systemctl enable chronyd
-sudo dnf update -y
-reboot
-
+git clone https://github.com/jadebustos/devopslabs.git
 git clone https://github.com/ekaitzbalbas/unir_practica2.git
 
 sudo dnf install python3 -y
@@ -12,21 +8,11 @@ sudo dnf install git ansible -y
 pip3 install ansible --user
 ansible --version
 
-sudo adduser -md /home/ansible ansible
-sudo passwd ansible
-
-nano /etc/sudoers.d/ ansible
-
-nano /etc/hosts
-
-cd /etc/sudoers.d
-nano /etc/sudoers.d/ansible
-ansible ALL=(ALL) NOPASSWD:ALL
-
-nano /etc/hosts
 ansible -i hosts -m ping all
 
 ssh -p 22 adminUsername@51.144.239.209 # master
 ssh -p 22 adminUsername@51.144.248.243 # worker01
 ssh -p 22 adminUsername@51.144.113.233 # nfs
 
+ansible-playbook -i hosts tareas_previas_conf.yml 
+ansible-playbook -i hosts instalar_NFS.yml 
