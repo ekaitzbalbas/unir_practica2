@@ -1,21 +1,23 @@
 - name: tareas previas de configuracion
   hosts: all
   become: yes
+  vars_files:
+    - 'group_vars/preconfig.yaml'
   tasks:
     - name: Establecer la zona horaria a Europe/Madrid
       timezone:
         name: Europe/Madrid  
 
-    - name: Instalar la ultima version de chrony 
+    - name: Instalar la ultima version del paquete chrony 
       dnf:
         name: chrony 
         state: latest  
 
-    - name: Habilitar and arrancar el servicio de chronyd on centos
+    - name: Habilitar y arrancar el servicio chronyd
       systemd:
         name: chronyd    
-        enabled: yes
         state: started
+        enabled: yes
 
     - name: Habilitar ntp
       command: /usr/bin/timedatectl set-ntp true
@@ -24,9 +26,7 @@
     - name: Desactivar SELinux 
       shell: sed -i s/=enforcing/=disabled/g /etc/selinux/config
 
-    - name: Instalar la ultima version de nfs-utils nfs4-acl-tools wget
+    - name: Instalar la ultima version de los paquetes nfs-utils nfs4-acl-tools wget
       dnf:
-        name: nfs-utils 
-        name: nfs4-acl-tools 
-        name: wget 
+        name: '{{ preconfig_items }}' 
         state: latest        

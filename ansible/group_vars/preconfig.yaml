@@ -1,0 +1,1 @@
+preconfig_items: ['nfs-utils', 'nfs4-acl-tools', 'wget']

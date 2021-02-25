@@ -1,0 +1,64 @@
+- name: Deploy NFS Server
+  hosts: nfs
+  become: yes
+  # gather_facts: true
+  vars_files:
+    - 'group_vars/nfs.yaml'
+  tasks:
+    # En la practica pone que hay no hay crear un disco, pero esta carpeta es necesaria para el comando xportfs -r && exportfs -s
+    - name: Lanzar comando 'mkdir /srv/nfs' necesario para el comando 'exportfs -r && exportfs -s'
+      shell: exportfs -r && exportfs -s
+
+    - name: Instalar los paquetes NFS
+      dnf:
+        name: '{{ nfs_items }}'
+        state: latest
+      when: ansible_os_family == 'RedHat'
+
+    - name: Habilitar and arrancar el servicio NFS
+      systemd:
+        name: nfs-server    
+        enabled: yes
+        state: started
+        masked: no
+      when: ansible_os_family == 'RedHat'  
+
+    - name: Touch el fichero /etc/exports
+      file: 
+        path: /etc/exports
+        state: touch     
+
+    - name: Modificar el fichero /etc/exports para agregar las IPs de nuestros master y workers
+      lineinfile: 
+        path: /etc/exports
+        line: '/srv/nfs {{ item.line }}(rw,sync)'      
+      with_items:
+        - { vm: 'master', line: '104.214.238.26' }
+        - { vm: 'worker01', line: '104.214.238.87' }
+        # - { vm: 'worker02', line: '104.214.238.87' }
+
+    - name: Modify Exports - Apply Configure Changes
+      shell: exportfs -r && exportfs -s
+
+    - name: Habilitar el Firewall
+      systemd:
+        name: firewalld    
+        enabled: yes
+        state: started        
+
+    - name: Configurar el Firewall
+      firewalld:
+        service: '{{ item }}'
+        permanent: yes
+        state: enabled
+        immediate: yes
+      with_items:
+        - 'nfs'
+        - 'rpc-bind'
+        - 'mountd'     
+        
+    - name: Reiniciar el Firewall
+      systemd:
+        name: firewalld    
+        state: reloaded
+
