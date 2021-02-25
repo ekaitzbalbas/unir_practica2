@@ -10,9 +10,6 @@ ansible --version
 
 ansible -i hosts -m ping all
 
-ssh -p 22 adminUsername@51.144.239.209 # master
-ssh -p 22 adminUsername@51.144.248.243 # worker01
-ssh -p 22 adminUsername@51.144.113.233 # nfs
-
-ansible-playbook -i hosts tareas_previas_conf.yml 
-ansible-playbook -i hosts instalar_NFS.yml 
+ansible-playbook -i hosts tareas_previas_conf.yaml 
+ansible-playbook -i hosts Instalar_servidor_NFS.yaml 
+ansible-playbook -i hosts tareas_comunes_master_worker.yaml
