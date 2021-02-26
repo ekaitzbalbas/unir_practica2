@@ -10,6 +10,6 @@ ansible --version
 
 ansible -i hosts -m ping all
 
-ansible-playbook -i hosts tareas_previas_conf.yaml 
-ansible-playbook -i hosts Instalar_servidor_NFS.yaml 
-ansible-playbook -i hosts tareas_comunes_master_worker.yaml
+ansible-playbook -i hosts 01-tareas_previas_conf.yaml 
+ansible-playbook -i hosts 02-Instalar_servidor_NFS.yaml 
+ansible-playbook -i hosts 03-tareas_comunes_master_worker.yaml

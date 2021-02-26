@@ -33,9 +33,9 @@
         path: /etc/exports
         line: '/srv/nfs {{ item.line }}(rw,sync)'      
       with_items:
-        - { vm: 'master', line: '104.214.238.26' }
-        - { vm: 'worker01', line: '104.214.238.87' }
-        # - { vm: 'worker02', line: '104.214.238.87' }
+        - { vm: 'master', line: '10.0.1.10', linePublic: '40.115.5.17' }
+        - { vm: 'worker01', line: '10.0.1.12', linePublic: '13.93.36.20' }
+        # - { vm: 'worker02', line: '10.0.1.13', linePublic: 'XX' }
 
     - name: Modify Exports - Apply Configure Changes
       shell: exportfs -r && exportfs -s
