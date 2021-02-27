@@ -1,8 +1,6 @@
 - name: Tareas comunes a realizar en el nodo master y los workers
   hosts: master,worker
   become: yes
-  vars_files:
-    - 'group_vars/kubernetes.yaml'
   tasks:
     - name: Configuration DNS Servers
       blockinfile:

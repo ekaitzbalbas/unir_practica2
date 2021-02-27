@@ -1,0 +1,22 @@
+- name: Instalar la SDN de Calico
+  hosts: master
+  become: yes
+  tasks:
+    - name: Instalar el operador de Tigera
+      shell: kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml --dry-run=true
+
+    - name: Calico - descargar fichero de definicion
+      get_url:
+        url: https://docs.projectcalico.org/manifests/custom-resources.yaml
+        dest: /etc/custom-resources.yaml
+        force: yes
+
+    - name: Calico - Modificar cidr del fichero de definicion
+      replace:
+        path: /etc/custom-resources.yaml
+        regexp: 192.168.0.0/16
+        replace: 192.169.0.0/16
+ 
+    - name: Calico - Instalar
+      shell: kubectl apply -f /etc/custom-resources.yaml
+              
