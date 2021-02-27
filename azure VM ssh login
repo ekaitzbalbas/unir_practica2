@@ -1,3 +1,3 @@
-ssh adminUsername@40.115.5.17 # master
-ssh adminUsername@13.93.36.20 # worker01
-ssh adminUsername@40.118.68.217 # nfs
+ssh adminUsername@51.137.101.6 # master
+ssh adminUsername@23.100.13.102 # worker01
+ssh adminUsername@51.137.103.20 # nfs

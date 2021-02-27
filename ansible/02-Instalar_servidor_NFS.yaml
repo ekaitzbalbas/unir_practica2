@@ -6,8 +6,10 @@
     - 'group_vars/nfs.yaml'
   tasks:
     # En la practica pone que hay no hay crear un disco, pero esta carpeta es necesaria para el comando xportfs -r && exportfs -s
-    - name: Lanzar comando 'mkdir /srv/nfs' necesario para el comando 'exportfs -r && exportfs -s'
-      shell: exportfs -r && exportfs -s
+    - name: Crear directorio '/srv/nfs' necesario para el comando 'exportfs -r && exportfs -s'
+      file:
+        path: /srv/nfs
+        state: directory
 
     - name: Instalar los paquetes NFS
       dnf:
@@ -33,9 +35,9 @@
         path: /etc/exports
         line: '/srv/nfs {{ item.line }}(rw,sync)'      
       with_items:
-        - { vm: 'master', line: '10.0.1.10', linePublic: '40.115.5.17' }
-        - { vm: 'worker01', line: '10.0.1.12', linePublic: '13.93.36.20' }
-        # - { vm: 'worker02', line: '10.0.1.13', linePublic: 'XX' }
+        - { vm: 'master', line: '10.0.1.10' }
+        - { vm: 'worker01', line: '10.0.1.12' }
+        # - { vm: 'worker02', line: '10.0.1.13'
 
     - name: Modify Exports - Apply Configure Changes
       shell: exportfs -r && exportfs -s
@@ -57,8 +59,8 @@
         - 'rpc-bind'
         - 'mountd'     
         
-    - name: Reiniciar el Firewall
-      systemd:
-        name: firewalld    
-        state: reloaded
+    # - name: Reiniciar el Firewall
+    #   systemd:
+    #     name: firewalld    
+    #     state: reloaded
 

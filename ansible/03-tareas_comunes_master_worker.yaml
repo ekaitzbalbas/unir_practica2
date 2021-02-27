@@ -13,10 +13,10 @@
         block: |
           {{ item.ip }} {{ item.name }}
       loop:
-        - { name: master, ip: '10.0.1.10', ipPub: 40.115.5.17 }
-        - { name: worker01, ip: '10.0.1.12', ipPub: 13.93.36.20 }
-        # - { name: worker02, ip: '10.0.1.13', ipPub: 10.10.1.12 }
-        - { name: nfs, ip: '10.0.1.11', ipPub: 40.118.68.217 }
+        - { name: master, ip: '10.0.1.10' }
+        - { name: worker01, ip: '10.0.1.12' }
+        # - { name: worker02, ip: '10.0.1.13' }
+        - { name: nfs, ip: '10.0.1.11' }
 
     - name: Activar transparent masquerading - br_netfilter
       modprobe:
@@ -36,10 +36,10 @@
         permanent: yes
         immediate: yes
 
-    - name: Activar transparent masquerading - Reiniciar el Firewall
-      systemd:
-        name: firewalld
-        state: reloaded
+    # - name: Activar transparent masquerading - Reiniciar el Firewall
+    #   systemd:
+    #     name: firewalld
+    #     state: reloaded
 
     - name: Habilitar trafico cortafuegos - Touch k8s.conf
       file:
@@ -65,22 +65,72 @@
       shell: sed -i '/swap/d' /etc/fstab
       args:
         warn: false
+       
+    # - name: Docker - Agregar repositorio
+    #   get_url:
+    #     url: https://download.docker.com/linux/centos/docker-ce.repo
+    #     dest: /etc/yum.repos.d/docer-ce.repo
+
+    # - name: Docker - Instalar
+    #   dnf:
+    #     name: 
+    #       - docker-ce-19.03.14-3.el8
+    #       - containerd.io
+    #     state: present
+
+    # - name: Docker - Instalar
+    #   dnf:
+    #     name: 
+    #       - 'https://download.docker.com/linux/centos/8/x86_64/stable/Packages/docker-ce-cli-19.03.14-3.el8.x86_64.rpm'
+    #       - containerd.io
+    #     state: present
 
     - name: Docker - Agregar repositorio
-      get_url:
-        url: https://download.docker.com/linux/centos/docker-ce.repo
-        dest: /etc/yum.repos.d/docer-ce.repo
+      shell: dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
 
     - name: Docker - Instalar
-      package:
-        name: docer-ce
-          # - docker-ce-19.03.14-3.el8
-          # - containerd.io
-        state: absent
-        # state: latest
+      shell: dnf install docker-ce-19.03.14-3.el8 containerd.io -y    
+  
+    - name: Docker - Habilitar y arrancar el servicio
+      systemd:
+        name: docker
+        daemon_reload: yes
+        enabled: yes
+        state: started
 
-    # - name: Docker - Habilitar y arrancar el servicio
-    #   service:
-    #     name: docker
-    #     enabled: yes
-    #     state: started
+    - name: Kubernetes - Touch kubernetes.repo
+      file:
+        path: /etc/yum.repos.d/kubernetes.repo
+        state: touch
+
+    - name: Kubernetes - Configurar kubernetes.repo
+      blockinfile:
+        path: /etc/yum.repos.d/kubernetes.repo
+        insertafter: EOF      
+        marker: ''  
+        block: |
+          [kubernetes]
+          name=Kubernetes
+          baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+          enabled=1
+          gpgcheck=1
+          repo_gpgcheck=1
+          gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+          exclude=kubelet kubeadm kubectl
+
+    - name: Kubernetes -  Install Binaries
+      dnf: 
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl 
+        state: present
+        update_cache: yes
+        disable_excludes: kubernetes
+
+    - name: Kubernetes - Habilitar y arrancar Kubelet
+      systemd:
+        name: kubelet
+        daemon_reload: yes
+        state: started
+        enabled: yes

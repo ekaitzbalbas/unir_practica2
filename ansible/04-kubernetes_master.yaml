@@ -1,0 +1,80 @@
+- name: Configurar kubernetes en el nodo master
+  hosts: master
+  become: yes
+  vars_files:
+    - 'group_vars/kubernetes.yaml'
+  tasks:
+    - name: Configurar el Firewall para acceder a los servicios de kubernetes
+      firewalld:
+        port: '{{ item }}'
+        permanent: yes
+        state: enabled
+        immediate: yes
+      with_items:
+        - '6443/tcp'
+        - '2379-2380/tcp'
+        - '10250/tcp'
+        - '10251/tcp' 
+        - '10252/tcp'
+        - '10255/tcp'
+
+    # - name: Activar transparent masquerading - Reiniciar el Firewall
+    #   systemd:
+    #     name: firewalld
+    #     state: reloaded        
+
+    - name: Configurar kudeadm
+      shell: kubeadm config images pull
+
+    - name: Configurar el Firewall para permitir acceso desde los workers
+      firewalld:
+        rich_rule: '{{ item }}'
+        permanent: yes
+        state: enabled
+        immediate: yes
+      with_items:
+        - 'rule family=ipv4 source address=10.0.1.12/24 accept' #worker01
+        # - 'rule family=ipv4 source address=10.0.1.12/24 accept' #worker02
+
+    # - name: Activar transparent masquerading - Reiniciar el Firewall
+    #   systemd:
+    #     name: firewalld
+    #     state: reloaded
+
+    - name: Configurar el Firewall para permitir acceso de los contenedores a localhost
+      firewalld:
+        rich_rule: 'rule family=ipv4 source address=172.17.0.1/16 accept'
+        zone: public
+        permanent: yes
+        state: enabled
+        immediate: yes
+
+    - name: Reiniciar kubeadm por si se hubiera lanzado previamente 
+      shell: kubeadm reset -f
+
+    - name: Reiniciar servicio kubelet
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: restarted
+
+    - name: Instalar el plugin CNI (Container Network Interface) de kubernetes y definir la red de los PODs
+      shell: kubeadm init --pod-network-cidr 192.169.0.0/16 --ignore-preflight-errors=NumCPU
+ 
+    - name: Autorizar usuario root - Crear directorio 
+      file:
+        path: /root/.kube
+        state: directory
+
+    - name: Autorizar usuario root - Copiar fichero 
+      copy:
+        remote_src: yes
+        src: /etc/kubernetes/admin.conf
+        dest: /root/.kube/config
+        # mode: u=rw,g=r
+
+    - name: Autorizar usuario root - Dar permisos al fichero  
+      shell: chown $(id -u):$(id -g) /root/.kube/config 
+
+    # - name: Comprobar estado nodos  
+    #   shell: kubectl get nodes
