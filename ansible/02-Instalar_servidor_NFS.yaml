@@ -1,4 +1,4 @@
-- name: Deploy NFS Server
+- name: Instalar servidor NFS
   hosts: nfs
   become: yes
   # gather_facts: true
@@ -15,7 +15,6 @@
       dnf:
         name: '{{ nfs_items }}'
         state: latest
-      when: ansible_os_family == 'RedHat'
 
     - name: Habilitar and arrancar el servicio NFS
       systemd:
@@ -23,9 +22,8 @@
         enabled: yes
         state: started
         masked: no
-      when: ansible_os_family == 'RedHat'  
 
-    - name: Touch el fichero /etc/exports
+    - name: Crear el fichero /etc/exports
       file: 
         path: /etc/exports
         state: touch     
@@ -37,9 +35,9 @@
       with_items:
         - { vm: 'master', line: '10.0.1.10' }
         - { vm: 'worker01', line: '10.0.1.12' }
-        # - { vm: 'worker02', line: '10.0.1.13'
+        - { vm: 'worker02', line: '10.0.1.13' }
 
-    - name: Modify Exports - Apply Configure Changes
+    - name: Releer el fichero /etc/exports - Aplicar la nueva configuración
       shell: exportfs -r && exportfs -s
 
     - name: Habilitar el Firewall

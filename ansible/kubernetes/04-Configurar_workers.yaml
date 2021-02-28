@@ -1,0 +1,29 @@
+- name: Configurando los workers
+  hosts: worker
+  become: yes 
+  tasks:
+    - name: Firewall - Abrir puertos
+      firewalld:
+        port: '{{ item }}'      
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+      with_items:
+        - '10250/tcp'
+        - '30000-32767/tcp'       
+
+    - name: Reiniciar kubeadm por si se hubiera lanzado previamente 
+      shell: kubeadm reset -f
+
+    - name: Reiniciar servicio kubelet
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: restarted   
+ 
+    - debug: 
+        msg: kubeadm join comando = {{ hostvars['master']['kube_join'] }}   
+
+    - name: Kubernetes - Join al cluster
+      shell: "{{ hostvars['master']['kube_join'] }}"

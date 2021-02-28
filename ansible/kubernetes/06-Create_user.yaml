@@ -1,0 +1,36 @@
+- name: Crear usuario no administrador
+  hosts: master
+  become: yes
+  # gather_facts: false
+  tasks:
+    - name: Crear usuario
+      user: 
+        name: kubeadmin
+        create_home: yes
+        home: /home/kubeadmin
+
+    - name: Crear directorio '/home/kubeadmin/.kube' 
+      file:
+        path: /home/kubeadmin/.kube
+        state: directory
+
+    - name: Copiar fichero '/etc/kubernetes/admin.conf' al usuario kubeadmin
+      copy:
+        remote_src: yes
+        src: /etc/kubernetes/admin.conf
+        dest: /home/kubeadmin/.kube/config
+
+    - name: Dar permisos al fichero copiado
+      shell: chown $(id -u):$(id -g) /home/kubeadmin/.kube/config
+
+    - name: Crear el fichero '/etc/sudoers.d/kubeadmin'
+      file:
+        path: /etc/sudoers.d/kubeadmin
+        state: touch
+
+    - name: Modificar fichero '/etc/sudoers.d/kubeadmin'
+      lineinfile:
+        path: /etc/sudoers.d/kubeadmin
+        state: present
+        regexp: 'ALL  ALL=(ALL) NOPASSWD:ALL'
+        line: 'ALL  ALL=(ALL) NOPASSWD:ALL'

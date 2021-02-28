@@ -3,7 +3,7 @@
   become: yes
   tasks:
     - name: Instalar el operador de Tigera
-      shell: kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml --dry-run=true
+      shell: kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
 
     - name: Calico - Descargar fichero de definicion
       get_url:
@@ -19,4 +19,3 @@
  
     - name: Calico - Instalar
       shell: kubectl apply -f /etc/custom-resources.yaml
-              

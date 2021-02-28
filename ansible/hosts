@@ -4,10 +4,11 @@ ansible_user=adminUsername
 ansible_port=22
 
 [master]
-51.137.101.6 #master
+master
 
 [worker]
-23.100.13.102 #worker01
+worker01
+worker02
 
 [nfs]
-51.137.103.20 #nfs
+nfs

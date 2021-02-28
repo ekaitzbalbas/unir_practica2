@@ -2,19 +2,26 @@
   hosts: master,worker
   become: yes
   tasks:
+    - name: Validar fichero hosts
+      shell: grep -c "10.0.1." /etc/hosts || true
+      register: file_hosts
+
+    # - debug:
+    #     msg: fichero hosts validado = {{ file_hosts.stdout }}
+
     - name: Configuration DNS Servers
       blockinfile:
         path: /etc/hosts
         insertafter: EOF
         marker: ''
-        # marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
         block: |
           {{ item.ip }} {{ item.name }}
       loop:
         - { name: master, ip: '10.0.1.10' }
         - { name: worker01, ip: '10.0.1.12' }
-        # - { name: worker02, ip: '10.0.1.13' }
+        - { name: worker02, ip: '10.0.1.13' }
         - { name: nfs, ip: '10.0.1.11' }
+      when: file_hosts.stdout == "0"
 
     - name: Activar transparent masquerading - br_netfilter
       modprobe:
@@ -39,10 +46,17 @@
     #     name: firewalld
     #     state: reloaded
 
-    - name: Habilitar trafico cortafuegos - Touch k8s.conf
+    - name: Habilitar trafico cortafuegos - Crear el fichero k8s.conf
       file:
         path: /etc/sysctl.d/k8s.conf
         state: touch
+
+    - name: Validar fichero k8s.conf
+      shell: grep -c "net.bridge.bridge-nf-call-ip" /etc/hosts || true
+      register: file_k8s
+
+    # - debug:
+    #     msg: fichero k8s.conf validado = {{ file_k8s.stdout }}
 
     - name: Habilitar trafico cortafuegos - Write k8s.conf
       blockinfile:
@@ -52,6 +66,7 @@
         block: |
           net.bridge.bridge-nf-call-ip6tables = 1
           net.bridge.bridge-nf-call-iptables = 1
+      when: file_k8s.stdout == "0"
 
     - name: Habilitar trafico cortafuegos - Reload sysctl
       shell: sysctl --system
@@ -63,32 +78,32 @@
       shell: sed -i '/swap/d' /etc/fstab
       args:
         warn: false
-       
-    # - name: Docker - Agregar repositorio
-    #   get_url:
-    #     url: https://download.docker.com/linux/centos/docker-ce.repo
-    #     dest: /etc/yum.repos.d/docer-ce.repo
+
+    - name: Docker - Agregar repositorio
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docer-ce.repo
+
+    - name: Docker - Instalar
+      dnf:
+        name:
+          - docker-ce-19.03.14-3.el8
+          - containerd.io
+        state: present
 
     # - name: Docker - Instalar
     #   dnf:
-    #     name: 
-    #       - docker-ce-19.03.14-3.el8
-    #       - containerd.io
-    #     state: present
-
-    # - name: Docker - Instalar
-    #   dnf:
-    #     name: 
+    #     name:
     #       - 'https://download.docker.com/linux/centos/8/x86_64/stable/Packages/docker-ce-cli-19.03.14-3.el8.x86_64.rpm'
     #       - containerd.io
     #     state: present
 
-    - name: Docker - Agregar repositorio
-      shell: dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+    # - name: Docker - Agregar repositorio
+    #   shell: dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
 
-    - name: Docker - Instalar
-      shell: dnf install docker-ce-19.03.14-3.el8 containerd.io -y    
-  
+    # - name: Docker - Instalar
+    #   shell: dnf install docker-ce-19.03.14-3.el8 containerd.io -y
+
     - name: Docker - Habilitar y arrancar el servicio
       systemd:
         name: docker
@@ -96,16 +111,23 @@
         enabled: yes
         state: started
 
-    - name: Kubernetes - Touch kubernetes.repo
+    - name: Kubernetes - Crear el fichero kubernetes.repo
       file:
         path: /etc/yum.repos.d/kubernetes.repo
         state: touch
 
+    - name: Validar fichero kubernetes.repo
+      shell: grep -c "[kubernetes]" /etc/yum.repos.d/kubernetes.repo || true
+      register: file_kubernetes_repo
+
+    # - debug:
+    #     msg: fichero kubernetes.repo validado = {{ file_kubernetes_repo.stdout }}
+
     - name: Kubernetes - Configurar kubernetes.repo
       blockinfile:
         path: /etc/yum.repos.d/kubernetes.repo
-        insertafter: EOF      
-        marker: ''  
+        insertafter: EOF
+        marker: ''
         block: |
           [kubernetes]
           name=Kubernetes
@@ -115,13 +137,14 @@
           repo_gpgcheck=1
           gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
           exclude=kubelet kubeadm kubectl
+      when: file_kubernetes_repo.stdout == "0"
 
     - name: Kubernetes -  Install Binaries
-      dnf: 
+      dnf:
         name:
           - kubelet
           - kubeadm
-          - kubectl 
+          - kubectl
         state: present
         update_cache: yes
         disable_excludes: kubernetes

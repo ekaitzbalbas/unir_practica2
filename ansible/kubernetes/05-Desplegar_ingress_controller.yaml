@@ -1,0 +1,6 @@
+- name: Desplegando un ingress controller
+  hosts: master
+  become: yes
+  tasks:
+    - name: Instalar haproxy-ingress.yaml
+      shell: kubectl apply -f https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/v1.5/deploy/haproxy-ingress.yaml

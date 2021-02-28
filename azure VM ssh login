@@ -1,3 +1,9 @@
-ssh adminUsername@51.137.101.6 # master
-ssh adminUsername@23.100.13.102 # worker01
-ssh adminUsername@51.137.103.20 # nfs
+ssh adminUsername@master
+ssh adminUsername@worker01
+ssh adminUsername@worker02
+ssh adminUsername@nfs
+
+ssh adminUsername@13.80.13.82 # master
+ssh adminUsername@13.69.10.194 # worker01
+ssh adminUsername@13.80.13.69 # worker01
+ssh adminUsername@65.52.136.134 # nfs   
