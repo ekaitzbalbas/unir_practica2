@@ -38,13 +38,7 @@
         - { vm: 'worker02', line: '10.0.1.13' }
 
     - name: Releer el fichero /etc/exports - Aplicar la nueva configuración
-      shell: exportfs -r && exportfs -s
-
-    - name: Habilitar el Firewall
-      systemd:
-        name: firewalld    
-        enabled: yes
-        state: started        
+      shell: exportfs -r && exportfs -s     
 
     - name: Configurar el Firewall
       firewalld:

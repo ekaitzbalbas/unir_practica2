@@ -29,4 +29,10 @@
     - name: Instalar la ultima version de los paquetes nfs-utils nfs4-acl-tools wget
       dnf:
         name: '{{ preconfig_items }}' 
-        state: latest        
+        state: latest
+        
+    - name: Habilitar el firewall
+      systemd:
+        name: firewalld    
+        enabled: yes
+        state: started           

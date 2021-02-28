@@ -28,12 +28,6 @@
         name: br_netfilter
         state: present
 
-    - name: Activar transparent masquerading - Habilitar el Firewall
-      systemd:
-        name: firewalld
-        enabled: yes
-        state: started
-
     - name: Activar transparent masquerading - Configurar Firewall
       firewalld:
         masquerade: yes
