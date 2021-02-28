@@ -5,7 +5,7 @@
     - name: Instalar el operador de Tigera
       shell: kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml --dry-run=true
 
-    - name: Calico - descargar fichero de definicion
+    - name: Calico - Descargar fichero de definicion
       get_url:
         url: https://docs.projectcalico.org/manifests/custom-resources.yaml
         dest: /etc/custom-resources.yaml

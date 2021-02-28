@@ -1,0 +1,14 @@
+- name: Configurando los workers
+  hosts: worker
+  become: yes 
+  tasks:
+    - name: Firewall - Abrir puertos
+      firewalld:
+        port: '{10250,30000-32767}/tcp'
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+ 
+    - name: Kubernetes - Join
+      shell: hostvars['10.0.1.10']['commandserver']

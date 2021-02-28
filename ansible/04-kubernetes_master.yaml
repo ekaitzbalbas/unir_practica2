@@ -1,8 +1,8 @@
 - name: Configurar kubernetes en el nodo master
   hosts: master
   become: yes
-  vars_files:
-    - 'group_vars/kubernetes.yaml'
+  # vars: 
+  #   kubejoin: 'initial'
   tasks:
     - name: Configurar el Firewall para acceder a los servicios de kubernetes
       firewalld:
@@ -50,7 +50,7 @@
         immediate: yes
 
     - name: Reiniciar kubeadm por si se hubiera lanzado previamente 
-      shell: kubeadm reset -f
+      shell: kubeadm reset -f && rm -rf /etc/kubernetes/
 
     - name: Reiniciar servicio kubelet
       systemd:
@@ -59,8 +59,9 @@
         state: restarted
 
     - name: Instalar el plugin CNI (Container Network Interface) de kubernetes y definir la red de los PODs
-      shell: kubeadm init --pod-network-cidr 192.169.0.0/16 --ignore-preflight-errors=NumCPU
- 
+      shell: kubeadm init --pod-network-cidr 192.169.0.0/16 --ignore-preflight-errors=NumCPU 
+      register: cs2
+
     - name: Autorizar usuario root - Crear directorio 
       file:
         path: /root/.kube
@@ -78,3 +79,25 @@
 
     # - name: Comprobar estado nodos  
     #   shell: kubectl get nodes
+
+    - name: Crear token y almacenarlo en una variable
+      shell: kubeadm token create --print-join-command
+      register: cs
+
+    - name: Set kubejoin as fact
+      set_fact: kubejoin="{{ cs.stdout }}"      
+
+    - name: Print
+      debug: msg="{{ cs.stdout }}"
+
+    # - name: Print
+    #   debug: msg="{{ cs2.stdout }}"      
+
+    # - name: Print
+    #   debug: msg="{{ hostvars['master']['kubejoin'] }}"
+
+    - name: Set hostname of command server as fact
+      set_fact: commandserver="{{ cs.stdout }}"   
+
+    - name: Print
+      debug: msg="{{ hostvars['master']['commandserver'] }}"
