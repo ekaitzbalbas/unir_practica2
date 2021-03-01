@@ -1,0 +1,3 @@
+- import_playbook: app_deploy/01-Crear_Namespace.yaml
+- import_playbook: app_deploy/02-Definir_Almacenamiento.yaml
+- import_playbook: app_deploy/03-Deployment.yaml

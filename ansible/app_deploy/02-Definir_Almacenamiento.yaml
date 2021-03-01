@@ -1,0 +1,104 @@
+- name: Desplegando un ingress controller
+  hosts: master
+  become: yes
+  vars_files:
+    - '../group_vars/app.yaml'  
+  tasks:
+    - name: Borrar el fichero nfs-pv.yaml
+      file:
+        path: /etc/nfs-pv.yaml
+        state: absent
+
+    - name: Crear el fichero nfs-pv.yaml
+      file:
+        path: /etc/nfs-pv.yaml
+        state: touch
+
+    - name: Modificar el fichero nfs-pv.yaml - definir un persistent volume
+      blockinfile:
+        path: /etc/nfs-pv.yaml
+        insertafter: EOF
+        marker: ''
+        block: |
+          apiVersion: v1
+          kind: PersistentVolume
+          metadata:
+            name: nfs-pv
+            namespace: {{ app_name }}
+          spec:
+            capacity:
+              storage: 10Gi
+            volumeMode: Filesystem
+            accessModes:
+              - ReadWriteMany
+            persistentVolumeReclaimPolicy: Recycle
+            storageClassName: nfs
+            mountOptions:
+              - hard
+              - nfsvers=4.1
+            nfs:
+              path: /srv/nfs
+              server: 10.0.1.11
+
+    - name: Definir el persistent volume
+      shell: kubectl apply -f /etc/nfs-pv.yaml
+
+    # - name: Definir el persistent volume - get pv
+    #   shell: kubectl get pv --namespace={{ app_name }}
+    #   register: kubectl_getpv
+
+    # - debug:
+    #     msg: kubectl_getpv = {{ kubectl_getpv.stdout }}      
+
+    # - name: Definir el persistent volume - describe pv
+    #   shell: kubectl describe pv --namespace={{ app_name }}
+    #   register: kubectl_describepv
+
+    # - debug:
+    #     msg: kubectl_describepv = {{ kubectl_describepv.stdout }}  
+
+    - name: Borrar el fichero nfs-pvc.yaml
+      file:
+        path: /etc/nfs-pvc.yaml
+        state: absent
+
+    - name: Crear el fichero nfs-pvc.yaml
+      file:
+        path: /etc/nfs-pvc.yaml
+        state: touch
+
+    - name: Modificar el fichero nfs-pvc.yaml - Crear claim
+      blockinfile:
+        path: /etc/nfs-pvc.yaml
+        insertafter: EOF
+        marker: ''
+        block: |
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: nfs-pvc
+            namespace: {{ app_name }}
+          spec:
+            storageClassName: nfs
+            accessModes:
+              - ReadWriteMany
+            resources:
+              requests:
+                storage: 2Gi      
+              
+    - name: Hacer el claim
+      shell: kubectl apply -f /etc/nfs-pvc.yaml
+
+    # - name: Hacer el claim - get pvc
+    #   shell: kubectl get pvc --namespace={{ app_name }}
+    #   register: kubectl_getpvc
+
+    # - debug:
+    #     msg: kubectl_getpvc = {{ kubectl_getpvc.stdout }}      
+
+    # - name: Hacer el claim - describe pvc
+    #   shell: kubectl describe pvc nfs-pvc --namespace={{ app_name }}
+    #   register: kubectl_describepvc
+
+    # - debug:
+    #     msg: kubectl_describepvc = {{ kubectl_describepvc.stdout }}  

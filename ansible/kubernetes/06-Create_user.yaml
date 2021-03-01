@@ -2,12 +2,15 @@
   hosts: master
   become: yes
   # gather_facts: false
+  vars:
+    user_password: kubeadmin
   tasks:
     - name: Crear usuario
       user: 
         name: kubeadmin
         create_home: yes
         home: /home/kubeadmin
+        password: "{{ user_password | password_hash('sha512') }}"
 
     - name: Crear directorio '/home/kubeadmin/.kube' 
       file:

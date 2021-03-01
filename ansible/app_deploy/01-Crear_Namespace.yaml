@@ -1,0 +1,20 @@
+- name: Crear un namespace
+  hosts: master
+  become: yes
+  vars_files:
+    - '../group_vars/app.yaml'
+  tasks:
+    - name: Validar si el namespace {{ app_name }} existe 
+      shell: kubectl get namespaces
+      register: kubectl_namespaces
+
+    - debug:
+        msg: kubectl_namespaces = {{ kubectl_namespaces.stdout }}
+
+    - set_fact: app_name="{{ app_name }}"        
+
+    - name: Crear el namespace {{ app_name }}  
+      shell: kubectl create namespace {{ app_name }}
+      when: 'app_name not in kubectl_namespaces.stdout'
+      # when: '"{{ app_name }}" not in kubectl_namespaces.stdout'
+      # when: kubectl_namespaces.stdout.find('{{ app_name }}') == -1

@@ -1,4 +1,4 @@
-- name: Desplegando un ingress controller
+- name: Desplegar un ingress controller
   hosts: master
   become: yes
   tasks:

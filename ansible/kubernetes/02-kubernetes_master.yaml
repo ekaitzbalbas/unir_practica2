@@ -80,9 +80,9 @@
     # - name: Comprobar estado nodos  
     #   shell: kubectl get nodes
 
-    # - name: Crear token y almacenarlo en una variable
-    #   shell: kubeadm token create --print-join-command
-    #   register: kube
+    - name: Crear token y almacenarlo en una variable
+      shell: kubeadm token create --print-join-command
+      register: kube
 
     - name: Set kube_join as host variable
       set_fact: kube_join="{{ kube.stdout }}"      
