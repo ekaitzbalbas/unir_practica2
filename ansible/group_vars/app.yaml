@@ -1,1 +1,3 @@
-app_name: 'unirpractica'
+app_name: 'webapp-volumes'
+service_name: 'volumes-service'
+ingress_name: 'volumes-ingress'
