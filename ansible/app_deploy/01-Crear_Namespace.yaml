@@ -8,8 +8,8 @@
       shell: kubectl get namespaces
       register: kubectl_namespaces
 
-    - debug:
-        msg: kubectl_namespaces = {{ kubectl_namespaces.stdout }}
+    # - debug:
+    #     msg: kubectl_namespaces = {{ kubectl_namespaces.stdout }}
 
     - set_fact: app_name="{{ app_name }}"        
 

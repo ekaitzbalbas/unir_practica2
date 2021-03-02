@@ -87,5 +87,5 @@
     - name: Set kube_join as host variable
       set_fact: kube_join="{{ kube.stdout }}"      
 
-    - debug: 
-        msg: kubeadm join output = {{ hostvars['master']['kube_join'] }}
+    # - debug: 
+    #     msg: kubeadm join output = {{ hostvars['master']['kube_join'] }}

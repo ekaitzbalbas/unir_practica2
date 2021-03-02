@@ -22,8 +22,8 @@
         enabled: yes
         state: restarted   
  
-    - debug: 
-        msg: kubeadm join comando = {{ hostvars['master']['kube_join'] }}   
+    # - debug: 
+    #     msg: kubeadm join comando = {{ hostvars['master']['kube_join'] }}   
 
     - name: Kubernetes - Join al cluster
       shell: "{{ hostvars['master']['kube_join'] }}"
