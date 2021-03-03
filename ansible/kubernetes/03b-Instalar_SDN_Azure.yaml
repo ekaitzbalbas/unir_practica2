@@ -1,0 +1,18 @@
+- name: Firewall - Abrir puertos para la SDN en Azure de Calico
+  hosts: master,worker
+  become: yes
+  tasks:
+    - firewalld:
+        port: '{{ item }}'
+        permanent: yes
+        state: enabled
+        immediate: yes
+      with_items:
+        - '8285/udp'
+        - '8472/udp'
+
+- name: Descargar fichero canal.yaml
+  hosts: master
+  become: yes
+  tasks:  
+    - shell: kubectl apply -f https://docs.projectcalico.org/manifests/canal.yaml

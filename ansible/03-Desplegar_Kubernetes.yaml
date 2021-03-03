@@ -1,6 +1,7 @@
 - import_playbook: kubernetes/01-tareas_comunes_master_worker.yaml
 - import_playbook: kubernetes/02-kubernetes_master.yaml
 - import_playbook: kubernetes/03-Instalar_SDN.yaml
+- import_playbook: kubernetes/03b-Instalar_SDN_Azure.yaml
 - import_playbook: kubernetes/04-Configurar_workers.yaml
 - import_playbook: kubernetes/05-Desplegar_ingress_controller.yaml
 - import_playbook: kubernetes/06-Create_user.yaml

@@ -27,6 +27,7 @@ ansible-playbook -i hosts 04-Desplegar_Aplicacion.yaml
 ansible-playbook -i hosts kubernetes/01-tareas_comunes_master_worker.yaml3:19.03
 ansible-playbook -i hosts kubernetes/02-kubernetes_master.yaml
 ansible-playbook -i hosts kubernetes/03-Instalar_SDN.yaml
+ansible-playbook -i hosts kubernetes/03b-Instalar_SDN_Azure.yaml
 ansible-playbook -i hosts kubernetes/04-Configurar_workers.yaml
 ansible-playbook -i hosts kubernetes/05-Desplegar_ingress_controller.yaml
 ansible-playbook -i hosts kubernetes/06-Create_user.yaml
@@ -34,3 +35,6 @@ ansible-playbook -i hosts kubernetes/06-Create_user.yaml
 ansible-playbook -i hosts app_deploy/01-Crear_Namespace.yaml
 ansible-playbook -i hosts app_deploy/02-Definir_Almacenamiento.yaml
 ansible-playbook -i hosts app_deploy/03-Deployment.yaml
+
+ansible-playbook -i hosts app_deploy2/01-Crear_Namespace.yaml
+ansible-playbook -i hosts app_deploy2/02-Deployment.yaml

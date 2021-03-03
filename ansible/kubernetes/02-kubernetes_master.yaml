@@ -4,7 +4,7 @@
   # vars: 
   #   kubejoin: 'initial'
   tasks:
-    - name: Configurar el Firewall para acceder a los servicios de kubernetes
+    - name: Firewall - Abrir puertos para acceder a los servicios de kubernetes
       firewalld:
         port: '{{ item }}'
         permanent: yes
